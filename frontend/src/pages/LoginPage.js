@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-export default function AuthPage() {
+export default function AuthPage({ onLogin }) {
   const [activeTab, setActiveTab] = useState("login");
 
   return (
@@ -67,7 +67,10 @@ export default function AuthPage() {
                 Remember Me
               </div>
 
-              <button className="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-md text-sm font-medium">
+              <button 
+                onClick={onLogin}
+                className="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-md text-sm font-medium"
+              >
                 Login
               </button>
 
