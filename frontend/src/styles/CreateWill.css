@@ -1,0 +1,15 @@
+.create-container {
+  padding: 30px;
+}
+
+textarea {
+  width: 100%;
+  height: 100px;
+  margin-bottom: 10px;
+}
+
+.will-box {
+  border: 1px solid gray;
+  padding: 10px;
+  margin: 10px 0;
+}

@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Environment variables (NEVER commit these)
+.env
+**/.env
+
+# Build output
+frontend/build/
+frontend/.cache/
+
+# Python virtual environment
+ai-models/venv/
+ai-models/__pycache__/
+**/__pycache__/
+*.pyc
+
+# Hardhat artifacts
+blockchain/artifacts/
+blockchain/cache/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
