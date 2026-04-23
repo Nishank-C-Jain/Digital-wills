@@ -1,7 +1,37 @@
-import React from "react";
+import React, { useState } from "react";
+import { calculateRisk } from "../utils/riskScore";
+import { detectFraud } from "../utils/fraudDetection";
+import { analyzeSentiment } from "../utils/sentiment";
 
-export default function AnalyzeWill({ onBack }) {
+export default function AnalyzeWill({ onBack, onLogout, goToBeneficiary }) {
   const user = { name: "User" };
+
+  const [willText] = useState(
+    "I, Aarav Sharma, a resident of Mumbai, India, declare this to be my last will and testament. Recently, I have made several changes to my will. I appoint Aman Gupta as the executor of my will. I leave my house in Bandra to my wife, but disinherit my children ⚠️"
+  );
+  
+  const sentiment = analyzeSentiment(willText);
+  
+  // Mock beneficiaries to run anomaly detection against
+  const [beneficiaries] = useState([
+    { name: "Priya Sharma", share: 85 },
+    { name: "Aman Gupta", share: 10 }
+  ]);
+
+  const fraudWarnings = detectFraud(beneficiaries);
+
+  const riskScore = calculateRisk(sentiment, fraudWarnings);
+
+  const getRiskLabel = (score) => {
+    if (score >= 70) return "High Risk Detected";
+    if (score >= 40) return "Moderate Risks Detected";
+    return "Low Risk Detected";
+  };
+  const getRiskColor = (score) => {
+    if (score >= 70) return "text-red-500";
+    if (score >= 40) return "text-orange-500";
+    return "text-green-500";
+  };
 
   return (
     <div className="min-h-screen bg-[#f4f7fb]">
@@ -35,12 +65,12 @@ export default function AnalyzeWill({ onBack }) {
         {/* 🔷 SIDEBAR */}
         <div className="w-64 bg-white shadow-sm p-6">
           <ul className="space-y-6 text-gray-600">
-            <li className="flex items-center gap-2 cursor-pointer">🏠 Dashboard</li>
+            <li className="flex items-center gap-2 cursor-pointer hover:text-blue-500" onClick={onBack}>🏠 Dashboard</li>
             <li className="flex items-center gap-2 text-blue-600 font-medium bg-blue-50 p-2 rounded">
               📊 Analyze Will
             </li>
-            <li className="flex items-center gap-2 cursor-pointer">👥 Beneficiaries</li>
-            <li className="flex items-center gap-2 cursor-pointer">⏻ Logout</li>
+            <li className="flex items-center gap-2 cursor-pointer hover:text-blue-500" onClick={goToBeneficiary}>👥 Beneficiaries</li>
+            <li className="flex items-center gap-2 cursor-pointer hover:text-red-500" onClick={onLogout}>⏻ Logout</li>
           </ul>
         </div>
 
@@ -62,24 +92,12 @@ export default function AnalyzeWill({ onBack }) {
                 Analyzing Will
               </h2>
 
-              <p className="mb-3 text-gray-700">
-                I, Aarav Sharma, a resident of Mumbai, India, declare this to be my last will and testament.
+              <p className="mb-3 text-gray-700 bg-gray-50 p-4 rounded-lg border">
+                {willText}
               </p>
 
-              <p className="bg-yellow-100 text-yellow-800 px-3 py-2 rounded mb-3">
-                Recently, I have made several changes to my will.
-              </p>
-
-              <p className="bg-gray-100 px-3 py-2 rounded mb-3">
-                I appoint Aman Gupta as the executor of my will.
-              </p>
-
-              <p className="bg-red-100 text-red-700 px-3 py-2 rounded mb-3">
-                I leave my house in Bandra to my wife, but disinherit my children ⚠️
-              </p>
-
-              <div className="bg-gray-50 border rounded-lg p-3 mt-4 text-sm text-gray-600">
-                Possible emotional distress detected.
+              <div className="bg-gray-50 border rounded-lg p-3 mt-4 text-sm text-gray-600 flex items-center gap-2">
+                {sentiment === "Negative" ? "⚠️ Possible emotional distress detected." : "✅ Will language appears normal."}
               </div>
 
               {/* ACTION BUTTONS */}
@@ -101,12 +119,12 @@ export default function AnalyzeWill({ onBack }) {
               <div className="bg-white rounded-2xl shadow p-5 text-center">
                 <h3 className="text-sm font-semibold mb-3">Risk Score</h3>
 
-                <div className="text-3xl font-bold text-orange-500">
-                  65%
+                <div className={`text-3xl font-bold ${getRiskColor(riskScore)}`}>
+                  {riskScore}%
                 </div>
 
                 <p className="text-sm text-gray-500">
-                  Moderate Risks Detected
+                  {getRiskLabel(riskScore)}
                 </p>
               </div>
 
@@ -148,13 +166,11 @@ export default function AnalyzeWill({ onBack }) {
               </div>
 
               {/* ALERT CARDS */}
-              <div className="bg-orange-100 p-4 rounded-xl text-sm">
-                ⚠️ Unusual beneficiary change detected
-              </div>
-
-              <div className="bg-yellow-100 p-4 rounded-xl text-sm">
-                ⚠️ Emotional language found
-              </div>
+              {fraudWarnings.map((warning, idx) => (
+                <div key={idx} className="bg-orange-100 p-4 rounded-xl text-sm mb-4">
+                  ⚠️ {warning}
+                </div>
+              ))}
 
             </div>
 

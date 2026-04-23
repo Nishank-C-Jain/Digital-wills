@@ -1,7 +1,38 @@
 import React, { useState } from "react";
+import { loginUser, registerUser } from "../utils/authApi";
 
 export default function AuthPage({ onLogin }) {
   const [activeTab, setActiveTab] = useState("login");
+  const [form, setForm] = useState({ name: "", email: "", password: "", confirmPassword: "" });
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleRegister = async () => {
+    if (form.password !== form.confirmPassword) {
+      alert("Passwords do not match!");
+      return;
+    }
+    const res = await registerUser({ name: form.name, email: form.email, password: form.password });
+    if (res.msg === "Registered successfully") {
+      alert(res.msg);
+      setActiveTab("login");
+    } else {
+      alert(res.msg || res.error || "Error");
+    }
+  };
+
+  const handleLogin = async () => {
+    const res = await loginUser({ email: form.email, password: form.password });
+    if (res.token) {
+      localStorage.setItem("token", res.token);
+      localStorage.setItem("user", JSON.stringify(res.user));
+      onLogin();
+    } else {
+      alert(res.msg || "Login failed");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#eef2f7] via-[#f8fbff] to-[#e6ecf5] flex items-center justify-center">
@@ -48,7 +79,10 @@ export default function AuthPage({ onLogin }) {
                 <span>📧</span>
                 <input
                   type="email"
-                  placeholder="aarav.sharma@gmail.com"
+                  name="email"
+                  value={form.email}
+                  onChange={handleChange}
+                  placeholder="Email"
                   className="w-full outline-none text-sm"
                 />
               </div>
@@ -57,6 +91,9 @@ export default function AuthPage({ onLogin }) {
                 <span>🔒</span>
                 <input
                   type="password"
+                  name="password"
+                  value={form.password}
+                  onChange={handleChange}
                   placeholder="Password"
                   className="w-full outline-none text-sm"
                 />
@@ -68,7 +105,7 @@ export default function AuthPage({ onLogin }) {
               </div>
 
               <button 
-                onClick={onLogin}
+                onClick={handleLogin}
                 className="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-md text-sm font-medium"
               >
                 Login
@@ -88,27 +125,42 @@ export default function AuthPage({ onLogin }) {
               <div className="mt-6 grid grid-cols-2 gap-3">
                 <input
                   type="text"
+                  name="name"
+                  value={form.name}
+                  onChange={handleChange}
                   placeholder="Full Name"
                   className="border rounded-md px-3 py-2 text-sm"
                 />
                 <input
                   type="email"
+                  name="email"
+                  value={form.email}
+                  onChange={handleChange}
                   placeholder="Email"
                   className="border rounded-md px-3 py-2 text-sm"
                 />
                 <input
                   type="password"
+                  name="password"
+                  value={form.password}
+                  onChange={handleChange}
                   placeholder="Password"
                   className="border rounded-md px-3 py-2 text-sm"
                 />
                 <input
                   type="password"
+                  name="confirmPassword"
+                  value={form.confirmPassword}
+                  onChange={handleChange}
                   placeholder="Confirm Password"
                   className="border rounded-md px-3 py-2 text-sm"
                 />
               </div>
 
-              <button className="mt-3 bg-blue-500 text-white px-4 py-2 rounded-md text-sm">
+              <button 
+                onClick={handleRegister}
+                className="mt-3 bg-blue-500 text-white px-4 py-2 rounded-md text-sm"
+              >
                 Register
               </button>
 
@@ -130,27 +182,42 @@ export default function AuthPage({ onLogin }) {
               <div className="grid grid-cols-2 gap-3">
                 <input
                   type="text"
+                  name="name"
+                  value={form.name}
+                  onChange={handleChange}
                   placeholder="Full Name"
                   className="border rounded-md px-3 py-2 text-sm"
                 />
                 <input
                   type="email"
+                  name="email"
+                  value={form.email}
+                  onChange={handleChange}
                   placeholder="Email"
                   className="border rounded-md px-3 py-2 text-sm"
                 />
                 <input
                   type="password"
+                  name="password"
+                  value={form.password}
+                  onChange={handleChange}
                   placeholder="Password"
                   className="border rounded-md px-3 py-2 text-sm"
                 />
                 <input
                   type="password"
+                  name="confirmPassword"
+                  value={form.confirmPassword}
+                  onChange={handleChange}
                   placeholder="Confirm Password"
                   className="border rounded-md px-3 py-2 text-sm"
                 />
               </div>
 
-              <button className="w-full bg-blue-500 text-white py-2 rounded-md">
+              <button 
+                onClick={handleRegister}
+                className="w-full bg-blue-500 text-white py-2 rounded-md"
+              >
                 Register
               </button>
 

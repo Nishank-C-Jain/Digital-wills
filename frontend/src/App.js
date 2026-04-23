@@ -5,12 +5,20 @@ import CreateWill from "./pages/CreateWill";
 import AnalyzeWill from "./pages/AnalyzeWill";
 import AdminDashboard from "./pages/AdminDashboard";
 import DeathVerification from "./pages/DeathVerification";
+import Beneficiary from "./pages/Beneficiary";
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
   const [page, setPage] = useState("dashboard");
   // pages:
   // "dashboard" | "create" | "analyze" | "admin" | "verify"
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setIsLoggedIn(false);
+    setPage("dashboard");
+  };
 
   // 🔴 LOGIN
   if (!isLoggedIn) {
@@ -23,6 +31,8 @@ function App() {
       <CreateWill
         onSubmit={() => setPage("analyze")}
         onBack={() => setPage("dashboard")}
+        onLogout={handleLogout}
+        goToBeneficiary={() => setPage("beneficiary")}
       />
     );
   }
@@ -32,26 +42,53 @@ function App() {
     return (
       <AnalyzeWill
         onBack={() => setPage("dashboard")}
+        onLogout={handleLogout}
+        goToBeneficiary={() => setPage("beneficiary")}
       />
     );
   }
 
   // 🟠 ADMIN DASHBOARD
   if (page === "admin") {
-    return <AdminDashboard />;
+    return (
+      <AdminDashboard 
+        onBack={() => setPage("dashboard")}
+        onLogout={handleLogout}
+      />
+    );
   }
 
   // 🔵 DEATH VERIFICATION
   if (page === "verify") {
-    return <DeathVerification />;
+    return (
+      <DeathVerification 
+        onBack={() => setPage("dashboard")} 
+        onLogout={handleLogout} 
+        goToCreateWill={() => setPage("create")}
+        goToBeneficiary={() => setPage("beneficiary")}
+      />
+    );
+  }
+
+  // 🟡 BENEFICIARY
+  if (page === "beneficiary") {
+    return (
+      <Beneficiary 
+        onBack={() => setPage("dashboard")} 
+        onLogout={handleLogout}
+      />
+    );
   }
 
   // 🔵 DEFAULT DASHBOARD
   return (
     <Dashboard
       goToCreateWill={() => setPage("create")}
+      goToAnalyze={() => setPage("analyze")}
       goToAdmin={() => setPage("admin")}
       goToVerify={() => setPage("verify")}
+      goToBeneficiary={() => setPage("beneficiary")}
+      onLogout={handleLogout}
     />
   );
 }

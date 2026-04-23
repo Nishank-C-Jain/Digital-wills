@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function AdminDashboard() {
+export default function AdminDashboard({ onBack, onLogout }) {
   return (
     <div className="min-h-screen bg-[#f4f7fb] flex">
 
@@ -9,18 +9,19 @@ export default function AdminDashboard() {
         <h2 className="font-semibold text-lg mb-6">Admin Dashboard</h2>
 
         <ul className="space-y-5 text-gray-600">
-          <li>🏠 Dashboard</li>
+          <li className="flex items-center gap-2 cursor-pointer hover:text-blue-500" onClick={onBack}>🏠 Dashboard</li>
           <li className="text-blue-600 font-medium bg-blue-50 p-2 rounded">
             📄 Pending Wills
           </li>
-          <li>👥 Users</li>
-          <li>📜 Audit Logs</li>
+          <li className="flex items-center gap-2 cursor-pointer">👥 Users</li>
+          <li className="flex items-center gap-2 cursor-pointer">📜 Audit Logs</li>
+          <li className="flex items-center gap-2 cursor-pointer hover:text-red-500 mt-8" onClick={onLogout}>⏻ Logout</li>
         </ul>
       </div>
 
       {/* MAIN */}
       <div className="flex-1 p-8">
-
+        <button onClick={onBack} className="mb-4 text-blue-500 hover:underline">&larr; Back to Dashboard</button>
         <h2 className="text-xl font-semibold mb-4">
           Pending Wills for Approval
         </h2>

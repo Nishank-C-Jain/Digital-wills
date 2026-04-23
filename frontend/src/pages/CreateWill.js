@@ -1,7 +1,56 @@
-import React from "react";
+import React, { useState } from "react";
 
-export default function CreateWill({ onBack }) {
+export default function CreateWill({ onBack, onSubmit, onLogout, goToBeneficiary }) {
   const user = { name: "User" };
+
+  const [willText, setWillText] = useState(
+    "I, Aarav Sharma, a resident of Mumbai, India, declare this to be my last will and testament..."
+  );
+  
+  const [beneficiaries, setBeneficiaries] = useState([
+    { id: 1, name: "Priya Sharma", relation: "Wife", email: "priya.sharma@gmail.com", role: "Nominee" }
+  ]);
+
+  const addBeneficiary = () => {
+    setBeneficiaries([
+      ...beneficiaries, 
+      { id: Date.now(), name: "", relation: "Wife", email: "", role: "Nominee" }
+    ]);
+  };
+
+  const updateBeneficiary = (index, field, value) => {
+    const newBens = [...beneficiaries];
+    newBens[index][field] = value;
+    setBeneficiaries(newBens);
+  };
+  
+  const removeBeneficiary = (index) => {
+    if (beneficiaries.length > 1) {
+      setBeneficiaries(beneficiaries.filter((_, i) => i !== index));
+    }
+  };
+
+  const handleWillSubmit = async () => {
+    try {
+      const response = await fetch("http://localhost:5000/api/wills/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          text: willText,
+          beneficiary: beneficiaries.map(b => b.name).filter(Boolean).join(", ")
+        })
+      });
+
+      if (response.ok) {
+        // Proceed to analyze page
+        onSubmit();
+      } else {
+        console.error("Failed to save will to DB");
+      }
+    } catch (err) {
+      console.error("Error submitting will:", err);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#f4f7fb]">
@@ -37,7 +86,10 @@ export default function CreateWill({ onBack }) {
         {/* 🔷 SIDEBAR */}
         <div className="w-64 bg-white shadow-sm p-6">
           <ul className="space-y-6 text-gray-600">
-            <li className="flex items-center gap-2 cursor-pointer">
+            <li 
+              className="flex items-center gap-2 cursor-pointer hover:text-blue-500"
+              onClick={onBack}
+            >
               🏠 Dashboard
             </li>
 
@@ -45,11 +97,17 @@ export default function CreateWill({ onBack }) {
               ✏️ Create/Edit Will
             </li>
 
-            <li className="flex items-center gap-2 cursor-pointer">
+            <li 
+              className="flex items-center gap-2 cursor-pointer hover:text-blue-500"
+              onClick={goToBeneficiary}
+            >
               👥 Beneficiaries
             </li>
 
-            <li className="flex items-center gap-2 cursor-pointer">
+            <li 
+              className="flex items-center gap-2 cursor-pointer hover:text-red-500"
+              onClick={onLogout}
+            >
               ⏻ Logout
             </li>
           </ul>
@@ -79,8 +137,9 @@ export default function CreateWill({ onBack }) {
               <p className="text-sm font-medium mb-2">Will Content</p>
 
               <textarea
+                value={willText}
+                onChange={(e) => setWillText(e.target.value)}
                 className="w-full border rounded-lg p-4 text-sm bg-gray-50 h-32 focus:ring-2 focus:ring-blue-200 outline-none"
-                defaultValue="I, Aarav Sharma, a resident of Mumbai, India, declare this to be my last will and testament..."
               />
 
               <p className="text-xs text-gray-500 mt-2">
@@ -92,58 +151,87 @@ export default function CreateWill({ onBack }) {
                 Beneficiary Details
               </h3>
 
-              <div className="grid grid-cols-2 gap-4">
+              {beneficiaries.map((ben, index) => (
+                <div key={ben.id} className="mb-6 relative bg-gray-50/50 p-4 rounded-lg border border-gray-100">
+                  {beneficiaries.length > 1 && (
+                    <button 
+                      onClick={() => removeBeneficiary(index)}
+                      className="absolute -top-2 -right-2 text-red-500 hover:text-red-700 text-xs bg-red-100 rounded-full w-5 h-5 flex items-center justify-center font-bold shadow-sm"
+                      title="Remove Beneficiary"
+                    >
+                      ×
+                    </button>
+                  )}
+                  <div className="grid grid-cols-2 gap-4">
+                    {/* Name */}
+                    <div className="flex items-center border rounded-md px-3 py-2 bg-white">
+                      <span className="text-gray-400 mr-2">👤</span>
+                      <input
+                        type="text"
+                        value={ben.name}
+                        onChange={(e) => updateBeneficiary(index, 'name', e.target.value)}
+                        placeholder="Full Name"
+                        className="w-full outline-none text-sm"
+                      />
+                    </div>
 
-                {/* Name */}
-                <div className="flex items-center border rounded-md px-3 py-2 bg-white">
-                  <span className="text-gray-400 mr-2">👤</span>
-                  <input
-                    type="text"
-                    defaultValue="Priya Sharma"
-                    className="w-full outline-none text-sm"
-                  />
+                    {/* Relation */}
+                    <select 
+                      value={ben.relation}
+                      onChange={(e) => updateBeneficiary(index, 'relation', e.target.value)}
+                      className="border rounded-md px-3 py-2 text-sm bg-white"
+                    >
+                      <option>Wife</option>
+                      <option>Mother</option>
+                      <option>Father</option>
+                      <option>Son</option>
+                      <option>Daughter</option>
+                      <option>Brother</option>
+                      <option>Sister</option>
+                    </select>
+
+                    {/* Email */}
+                    <div className="flex items-center border rounded-md px-3 py-2 bg-white">
+                      <span className="text-gray-400 mr-2">✉️</span>
+                      <input
+                        type="email"
+                        value={ben.email}
+                        onChange={(e) => updateBeneficiary(index, 'email', e.target.value)}
+                        placeholder="Email Address"
+                        className="w-full outline-none text-sm"
+                      />
+                    </div>
+
+                    {/* Role */}
+                    <select 
+                      value={ben.role}
+                      onChange={(e) => updateBeneficiary(index, 'role', e.target.value)}
+                      className="border rounded-md px-3 py-2 text-sm bg-white"
+                    >
+                      <option>Nominee</option>
+                      <option>Daughter</option>
+                      <option>Son</option>
+                    </select>
+                  </div>
                 </div>
-
-                {/* Relation */}
-                <select className="border rounded-md px-3 py-2 text-sm bg-white">
-                  <option>Wife</option>
-                  <option>Mother</option>
-                  <option>Father</option>
-                  <option>Son</option>
-                  <option>Daughter</option>
-                  <option>Brother</option>
-                  <option>Sister</option>
-                </select>
-
-                {/* Email */}
-                <div className="flex items-center border rounded-md px-3 py-2 bg-white">
-                  <span className="text-gray-400 mr-2">✉️</span>
-                  <input
-                    type="email"
-                    defaultValue="priya.sharma@gmail.com"
-                    className="w-full outline-none text-sm"
-                  />
-                </div>
-
-                {/* Role */}
-                <select className="border rounded-md px-3 py-2 text-sm bg-white">
-                  <option>Daughter</option>
-                  <option>Son</option>
-                  <option>Nominee</option>
-                </select>
-
-              </div>
+              ))}
 
               {/* Add */}
               <div className="flex justify-end mt-4">
-                <button className="border px-4 py-2 rounded text-sm hover:bg-gray-50">
-                  Add Beneficiary
+                <button 
+                  onClick={addBeneficiary}
+                  className="border border-blue-200 text-blue-600 px-4 py-2 rounded text-sm hover:bg-blue-50 font-medium"
+                >
+                  + Add Beneficiary
                 </button>
               </div>
 
               {/* Submit */}
               <div className="mt-6 text-right">
-                <button className="bg-gradient-to-r from-blue-500 to-blue-700 text-white px-6 py-2 rounded-lg shadow hover:scale-105 transition">
+                <button 
+                  onClick={handleWillSubmit}
+                  className="bg-gradient-to-r from-blue-500 to-blue-700 text-white px-6 py-2 rounded-lg shadow hover:scale-105 transition"
+                >
                   Submit Will
                 </button>
               </div>

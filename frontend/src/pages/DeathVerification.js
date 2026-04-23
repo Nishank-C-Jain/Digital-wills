@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function DeathVerification() {
+export default function DeathVerification({ onBack, onLogout, goToCreateWill, goToBeneficiary }) {
   return (
     <div className="min-h-screen bg-[#f4f7fb] flex">
 
@@ -11,18 +11,19 @@ export default function DeathVerification() {
         </h2>
 
         <ul className="space-y-5 text-gray-600">
-          <li>🏠 Dashboard</li>
-          <li>✏️ Create/Edit Will</li>
+          <li className="flex items-center gap-2 cursor-pointer hover:text-blue-500" onClick={onBack}>🏠 Dashboard</li>
+          <li className="flex items-center gap-2 cursor-pointer hover:text-blue-500" onClick={goToCreateWill}>✏️ Create/Edit Will</li>
           <li className="text-blue-600 font-medium bg-blue-50 p-2 rounded">
             ✔ Death Verification
           </li>
-          <li>👥 Beneficiaries</li>
+          <li className="flex items-center gap-2 cursor-pointer hover:text-blue-500" onClick={goToBeneficiary}>👥 Beneficiaries</li>
+          <li className="flex items-center gap-2 cursor-pointer hover:text-red-500 mt-8" onClick={onLogout}>⏻ Logout</li>
         </ul>
       </div>
 
       {/* MAIN */}
       <div className="flex-1 p-8">
-
+        <button onClick={onBack} className="mb-4 text-blue-500 hover:underline">&larr; Back to Dashboard</button>
         <h2 className="text-xl font-semibold mb-4">
           Verify Death & Grant Access
         </h2>

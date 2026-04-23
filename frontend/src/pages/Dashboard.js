@@ -1,7 +1,7 @@
 import React from "react";
 import { BarChart3, Users, ShieldCheck, FileText } from "lucide-react";
 
-export default function Dashboard() {
+export default function Dashboard({ goToCreateWill, goToAnalyze, goToAdmin, goToVerify, goToBeneficiary, onLogout }) {
   const user = { name: "User" };
 
   const cards = [
@@ -20,10 +20,16 @@ export default function Dashboard() {
 
         <ul className="space-y-4 text-gray-600">
           <li className="font-medium text-blue-600">Dashboard</li>
+          <li className="hover:text-blue-500 cursor-pointer" onClick={goToAnalyze}>Analyze Will</li>
           <li className="hover:text-blue-500 cursor-pointer">My Wills</li>
-          <li className="hover:text-blue-500 cursor-pointer">Beneficiaries</li>
+          <li className="hover:text-blue-500 cursor-pointer" onClick={goToBeneficiary}>Beneficiaries</li>
           <li className="hover:text-blue-500 cursor-pointer">Security</li>
           <li className="hover:text-blue-500 cursor-pointer">Activity</li>
+          <div className="pt-4 mt-4 border-t border-gray-200 space-y-4">
+            <li className="hover:text-blue-500 cursor-pointer" onClick={goToAdmin}>Admin Panel</li>
+            <li className="hover:text-blue-500 cursor-pointer" onClick={goToVerify}>Verify Death</li>
+            <li className="hover:text-red-500 text-red-400 cursor-pointer" onClick={onLogout}>Logout</li>
+          </div>
         </ul>
       </div>
 
@@ -69,7 +75,10 @@ export default function Dashboard() {
           {/* WILL CARD */}
           <div className="bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-2xl p-6 shadow-lg">
             <h3 className="text-lg font-semibold mb-4">Digital Wills</h3>
-            <button className="bg-white text-blue-600 px-4 py-2 rounded-lg mb-4 font-medium hover:scale-105 transition">
+            <button 
+              onClick={goToCreateWill}
+              className="bg-white text-blue-600 px-4 py-2 rounded-lg mb-4 font-medium hover:scale-105 transition"
+            >
               + Create New Will
             </button>
             <ul className="space-y-2 text-sm">
